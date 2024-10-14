@@ -3,7 +3,7 @@ imds = imageDatastore("dataset/*.jpg");
 % Store images from dataset in array
 imgs = readall(imds);
 % To use: change number within curly brackets to desired image number
-a = imgs{1};
+a = imgs{11};
 
 % Standard Deviation affects how noisy the resulting image is
 desiredstd = 32;
@@ -24,10 +24,12 @@ subplot(1,3,1), imshow(a,[]);
 title("Original Image");
 
 subplot(1,3,2), imshow(p,[]);
-title("Noisy Image");
+description = strcat("σ = ", string(desiredstd), ", μ = ", string(desiredmu));
+title({"Noisy Image", description});
 
 % Apply median filter
 [m] = Median_Filter(p, sliceSize);
 
 subplot(1,3,3), imshow(m,[]);
-title("Median Filtered Image");
+description = strcat(string(sliceSize), "x", string(sliceSize), " slice");
+title({"Median Filtered", description});
