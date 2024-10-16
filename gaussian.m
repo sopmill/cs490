@@ -10,5 +10,5 @@ function [g] = gaussian(a, std, mu)
 
   n = zeros(size(a));
   n = double(a) + (std .* randn(size(a)) + mu);
-  g = uint8(n);
+  g = n;
 end
