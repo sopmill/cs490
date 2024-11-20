@@ -3,13 +3,13 @@ imds = imageDatastore("dataset/*.jpg");
 % Store images from dataset in array
 imgs = readall(imds);
 % To use: change number within curly brackets to desired image number
-a = imgs{1};
+a = imgs{9};
 
 % Standard Deviation affects how noisy the resulting image is
-desiredstd = 32;
+desiredstd = 64;
 
 % Mean affects how bright the resulting image is
-desiredmu = 32;
+desiredmu = 256;
 
 % Slice size is the side length of the square of pixels 
 % used to calculate the median
