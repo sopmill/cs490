@@ -10,5 +10,6 @@ function [g] = gaussian(a, std, mu)
 
   n = zeros(size(a));
   n = double(a) + (std .* randn(size(a)) + mu);
-  g = n;
+  n = mat2gray(n); % Normalize to [0, 1]
+  g = im2uint8(n); % Stretch to uint8 range
 end

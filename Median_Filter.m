@@ -52,6 +52,8 @@ function [r] = Median_Filter(img, slice)
 
     % Copy the final filtered image to the output
     r = filteredImg;
+    r = mat2gray(r); % Normalize to [0, 1]
+    r = im2uint8(r); % Stretch to uint8 range
 
 end
 

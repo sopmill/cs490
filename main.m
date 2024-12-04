@@ -2,8 +2,13 @@
 imds = imageDatastore("dataset/*.jpg");
 % Store images from dataset in array
 imgs = readall(imds);
-% To use: change number within curly brackets to desired image number
-a = imgs{9};
+
+% Preallocate statistic vectors
+mse = zeros(75,2);
+psn = zeros(75,2);
+ent = zeros(75,3);
+ssi = zeros(75,2);
+rng = zeros(75,3);
 
 % Standard Deviation affects how noisy the resulting image is
 desiredstd = 64;
@@ -14,7 +19,7 @@ desiredmu = 256;
 % Slice size is the side length of the square of pixels 
 % used to calculate the median
 % Must be odd otherwise there's no middle pixel to change
-sliceSize = 5;
+sliceSize = 255;
 
 % Salt and Pepper Noise Density
 dens = 0.08;
@@ -22,60 +27,48 @@ dens = 0.08;
 % Speckle Noise Variance
 var = 0.08;
 
+for i=1:size(imgs(:))
+    a = imgs{i};
 
-subplot(3,3,1), imshow(a,[]);
-title("Original Image");
+    % Add gaussian noise
+    p = gaussian(a, desiredstd, desiredmu);
 
-% Add gaussian noise
-[p] = gaussian(a, desiredstd, desiredmu);
+    % Add salt & pepper noise
+    %p = imnoise(a, "salt & pepper", dens);
 
-subplot(3,3,2), imshow(p,[]);
-description = strcat("σ = ", string(desiredstd), ", μ = ", string(desiredmu));
-title({"Gaussian Noise", description});
+    % Add speckle noise
+    %p = imnoise(a, "speckle", var);
 
-% Apply median filter
-[m1] = Median_Filter(p, sliceSize);
+    % Add poisson noise
+    %p = poissrnd(double(a));
 
-subplot(3,3,3), imshow(m1,[]);
-description = strcat(string(sliceSize), "x", string(sliceSize), " slice");
-title({"Median Filtered", description});
+    % Apply median filter
+    [m1] = Median_Filter(p, sliceSize);
 
+    p = mat2gray(p); % Normalize to [0, 1]
+    p = im2uint8(p); % Stretch to uint8 range
 
+    m1 = mat2gray(m1); % Normalize to [0, 1]
+    m1 = im2uint8(m1); % Stretch to uint8 range
 
+    % Save to folder
+    %imgtitle = strcat("mpimg_" + i + ".jpg");
+    %imwrite(m1, imgtitle)
 
-subplot(3,3,4), imshow(a,[]);
-title("Original Image");
+    mse(i,1) = immse(p, a);
+    mse(i,2) = immse(m1, a);
 
-% Apply salt and pepper noise
-sp = imnoise(a, "salt & pepper", dens);
+    psn(i,1) = psnr(p, a);
+    psn(i,2) = psnr(m1, a);
 
-subplot(3,3,5), imshow(sp,[]);
-description = strcat("density = ", string(dens));
-title({"S&P Noise", description});
+    ent(i,1) = entropy(a);
+    ent(i,2) = entropy(p);
+    ent(i,3) = entropy(m1);
 
-% Apply median filter
-[m2] = Median_Filter(sp, sliceSize);
+    ssi(i,1) = ssim(p, a);
+    ssi(i,2) = ssim(m1, a);
 
-subplot(3,3,6), imshow(m2,[]);
-description = strcat(string(sliceSize), "x", string(sliceSize), " slice");
-title({"Median Filtered", description});
-
-
-
-
-subplot(3,3,7), imshow(a,[]);
-title("Original Image");
-
-% Apply salt and pepper noise
-speck = imnoise(a, "speckle", var);
-
-subplot(3,3,8), imshow(speck,[]);
-description = strcat("variance = ", string(var));
-title({"Speckle Noise", description});
-
-% Apply median filter
-[m3] = Median_Filter(speck, sliceSize);
-
-subplot(3,3,9), imshow(m3,[]);
-description = strcat(string(sliceSize), "x", string(sliceSize), " slice");
-title({"Median Filtered", description});
+    rng(i,1) = max(max(a))-min(min(a));
+    rng(i,2) = max(max(p))-min(min(p));
+    rng(i,3) = max(max(m1))-min(min(m1));
+end
