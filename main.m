@@ -1,3 +1,6 @@
+% Team 255
+% Digital Image Processing Final Project
+
 % Load dataset folder
 imds = imageDatastore("dataset/*.jpg");
 % Store images from dataset in array
@@ -29,6 +32,8 @@ var = 0.08;
 
 for i=1:size(imgs(:))
     a = imgs{i};
+
+    % Comment out each noise type except the one you want to use
 
     % Add gaussian noise
     p = gaussian(a, desiredstd, desiredmu);
